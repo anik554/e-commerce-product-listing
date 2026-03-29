@@ -1,8 +1,30 @@
-import { Search, Loader2 } from 'lucide-react';
-// import { api } from './services/api'; 
-// Use this to fetch data: api.fetchProducts(...)
+import { Search } from 'lucide-react';
+import { useProducts } from './hooks/useProducts';
+import { useCallback, useState } from 'react';
+import Pagination from './components/Pagination';
+import ProductCard from './components/ProductCard';
+import SkeletonCard from './components/SkeletonCard';
 
 function App() {
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [category, setCategory] = useState<string | undefined>();
+  const [search, setSearch] = useState('');
+  const [searchInput, setSearchInput] = useState('');
+  const { data, isLoading, error } = useProducts({ page, limit, category, search });
+  console.log(data);
+
+  const handleSearch = useCallback(() => {
+    setSearch(searchInput);
+    setPage(1);
+  }, [searchInput]);
+
+
+  const handleCategoryChange = (val: string) => {
+    setCategory(val || undefined);
+    setPage(1);
+  };
+
   return (
     <div style={{ minHeight: '100vh', padding: '2rem' }}>
       {/* Header Section */}
@@ -19,9 +41,12 @@ function App() {
       <section style={{ display: 'flex', gap: '1rem', marginBottom: '2rem' }}>
         <div className="glass-panel" style={{ display: 'flex', alignItems: 'center', padding: '0.75rem 1rem', flex: 1, maxWidth: '400px' }}>
           <Search size={20} color="var(--text-muted)" style={{ marginRight: '0.75rem' }} />
-          <input 
-            type="text" 
-            placeholder="Search products..." 
+          <input
+            type="text"
+            value={searchInput}
+            onChange={e => setSearchInput(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && handleSearch()}
+            placeholder="Search products..."
             style={{
               background: 'transparent',
               border: 'none',
@@ -31,10 +56,37 @@ function App() {
               fontSize: '1rem'
             }}
           />
+          {searchInput && (
+            <button
+              onClick={() => { setSearchInput(''); setSearch(''); setPage(1); }}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', padding: '0 4px' }}
+              aria-label="Clear search"
+            >
+              ✕
+            </button>
+          )}
         </div>
-        
-        <select 
+
+         <button
+          onClick={handleSearch}
           className="glass-panel"
+          style={{
+            padding: '0.75rem 1.25rem',
+            color: 'var(--primary)',
+            fontWeight: 600,
+            cursor: 'pointer',
+            border: '1px solid var(--primary)',
+            borderRadius: '12px',
+            fontSize: '14px',
+          }}
+        >
+          Search
+        </button>
+
+        <select
+          className="glass-panel"
+          value={category ?? ''}
+          onChange={e => handleCategoryChange(e.target.value)}
           style={{
             padding: '0.75rem 1rem',
             color: 'var(--text-main)',
@@ -55,7 +107,7 @@ function App() {
       {/* Main Grid Placeholder */}
       <main>
         {/* Placeholder state to visually guide candidate */}
-        <div style={{
+        {/* <div style={{
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
@@ -64,20 +116,59 @@ function App() {
           border: '1px dashed var(--border)',
           borderRadius: '16px',
         }}>
-           <Loader2 size={40} color="var(--primary)" className="spin" style={{ marginBottom: '1rem', animation: 'spin 2s linear infinite' }} />
-           <style>
-             {`
+          <Loader2 size={40} color="var(--primary)" className="spin" style={{ marginBottom: '1rem', animation: 'spin 2s linear infinite' }} />
+          <style>
+            {`
                @keyframes spin {
                  100% { transform: rotate(360deg); }
                }
              `}
-           </style>
-           <h2 style={{ marginBottom: '0.5rem' }}>Start Building Your Grid!</h2>
-           <p style={{ color: 'var(--text-muted)', textAlign: 'center', maxWidth: '500px' }}>
-             Use <code>src/services/api.ts</code> to fetch the products. Remember to build pagination and handle the network errors that the API frequently throws!
-           </p>
-        </div>
+          </style>
+          <h2 style={{ marginBottom: '0.5rem' }}>Start Building Your Grid!</h2>
+          <p style={{ color: 'var(--text-muted)', textAlign: 'center', maxWidth: '500px' }}>
+            Use <code>src/services/api.ts</code> to fetch the products. Remember to build pagination and handle the network errors that the API frequently throws!
+          </p>
+        </div> */}
+        {isLoading ? (
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
+            gap: '1.5rem',
+            marginBottom: '2.5rem',
+          }}>
+            <SkeletonCard />  
+            <SkeletonCard />
+            <SkeletonCard />
+            <SkeletonCard />
+            <SkeletonCard />
+            <SkeletonCard />
+            <SkeletonCard />
+            <SkeletonCard />
+            <SkeletonCard />
+            <SkeletonCard />
+          </div>
+        ):(
+          <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
+                gap: '1.5rem',
+                marginBottom: '2.5rem',
+              }}
+            >
+              {data?.data.map(product => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+        )}
       </main>
+      <Pagination
+        total={data?.total ?? 0}
+        page={page}
+        limit={limit}
+        onPageChange={setPage}
+        onLimitChange={setLimit}
+      />
     </div>
   );
 }
