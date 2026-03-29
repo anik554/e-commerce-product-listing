@@ -5,6 +5,7 @@ import Pagination from './components/Pagination';
 import ProductCard from './components/ProductCard';
 import SkeletonCard from './components/SkeletonCard';
 import { useBreakpoint } from './hooks/useBreakpoint';
+import ErrorState from './components/ErrorState';
 
 function App() {
   const [page, setPage] = useState(1);
@@ -139,21 +140,21 @@ function App() {
               <SkeletonCard key={i} />
             ))}
           </div>
-        ) : (
+        ) : error ? (<ErrorState onRetry={() => { }} message={error.message} />) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 mb-10">
             {data?.data.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
+            <Pagination
+              total={data?.total ?? 0}
+              page={page}
+              limit={limit}
+              onPageChange={setPage}
+              onLimitChange={setLimit}
+            />
           </div>
         )}
       </main>
-      <Pagination
-        total={data?.total ?? 0}
-        page={page}
-        limit={limit}
-        onPageChange={setPage}
-        onLimitChange={setLimit}
-      />
     </div>
   );
 }
