@@ -4,6 +4,7 @@ import { useCallback, useState } from 'react';
 import Pagination from './components/Pagination';
 import ProductCard from './components/ProductCard';
 import SkeletonCard from './components/SkeletonCard';
+import { useBreakpoint } from './hooks/useBreakpoint';
 
 function App() {
   const [page, setPage] = useState(1);
@@ -11,6 +12,7 @@ function App() {
   const [category, setCategory] = useState<string | undefined>();
   const [search, setSearch] = useState('');
   const [searchInput, setSearchInput] = useState('');
+  const screen = useBreakpoint();
   const { data, isLoading, error } = useProducts({ page, limit, category, search });
   console.log(data);
 
@@ -24,6 +26,8 @@ function App() {
     setCategory(val || undefined);
     setPage(1);
   };
+
+  const skeletonCount = screen === 'lg' ? 10 : screen === 'md' ? 6 : 1;
 
   return (
     <div style={{ minHeight: '100vh', padding: '2rem' }}>
@@ -67,7 +71,7 @@ function App() {
           )}
         </div>
 
-         <button
+        <button
           onClick={handleSearch}
           className="glass-panel"
           style={{
@@ -130,36 +134,17 @@ function App() {
           </p>
         </div> */}
         {isLoading ? (
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
-            gap: '1.5rem',
-            marginBottom: '2.5rem',
-          }}>
-            <SkeletonCard />  
-            <SkeletonCard />
-            <SkeletonCard />
-            <SkeletonCard />
-            <SkeletonCard />
-            <SkeletonCard />
-            <SkeletonCard />
-            <SkeletonCard />
-            <SkeletonCard />
-            <SkeletonCard />
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 mb-10">
+            {Array.from({ length: skeletonCount }).map((_, i) => (
+              <SkeletonCard key={i} />
+            ))}
           </div>
-        ):(
-          <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
-                gap: '1.5rem',
-                marginBottom: '2.5rem',
-              }}
-            >
-              {data?.data.map(product => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 mb-10">
+            {data?.data.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
         )}
       </main>
       <Pagination
