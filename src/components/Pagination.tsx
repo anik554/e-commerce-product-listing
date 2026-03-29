@@ -27,9 +27,10 @@ export default function Pagination({
   const triggerRef = useRef<HTMLButtonElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const totalPages = Math.ceil(total / limit);
-  const from = total === 0 ? 0 : (page - 1) * limit + 1;
-  const to = Math.min(page * limit, total);
+  const safLimit = limit > 0 ? limit : 1;
+  const totalPages = total > 0 ? Math.ceil(total / safLimit) : 1;
+  const from = total === 0 ? 0 : (page - 1) * safLimit + 1;
+  const to = Math.min(page * safLimit, total);
 
   const handleToggle = () => {
     if (!dropdownOpen && triggerRef.current) {
