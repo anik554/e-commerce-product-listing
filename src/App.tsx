@@ -7,14 +7,15 @@ import { useBreakpoint } from './hooks/useBreakpoint';
 import ErrorState from './components/ErrorState';
 import DebouncedSearch from './components/DebouncedSearch';
 
+
 function App() {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [category, setCategory] = useState<string | undefined>();
   const [search, setSearch] = useState('');
-  const screen = useBreakpoint();
   const { data, isLoading, error, refetch } = useProducts({ page, limit, category, search });
-  console.log(data);
+  const screen = useBreakpoint();
+
 
   const handleCategoryChange = (val: string) => {
     setCategory(val || undefined);
@@ -69,7 +70,18 @@ function App() {
               <SkeletonCard key={i} />
             ))}
           </div>
-        ) : error ? (<ErrorState onRetry={() => refetch()} message={error.message} />) : (
+        ) : error ? (<ErrorState onRetry={() => refetch()} message={error.message} />) : data?.data?.length === 0 ? (
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            minHeight: '40vh',
+            gap: '1rem',
+          }}>
+            <strong className='text-red-500 text-2xl'>No Data Found</strong>
+          </div>
+        ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 mb-10">
             {data?.data.map((product) => (
               <ProductCard key={product.id} product={product} />
