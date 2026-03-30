@@ -133,6 +133,7 @@ export default function Pagination({
         style={{
           display: "flex",
           alignItems: "center",
+          justifyContent: "flex-end",
           gap: "16px",
           fontSize: "14px",
           userSelect: "none",

@@ -32,14 +32,15 @@ const ProductCard = ({ product }: { product: Product }) => {
             </div>
 
             <div style={{ padding: '0.85rem 1rem 1.1rem' }}>
-                <p style={{ fontSize: '12px', color: 'var(--text-muted)', margin: '0 0 4px', fontWeight: 500 }}>
+                <p style={{ fontSize: '12px', color: 'var(--text-muted)', margin: '0 0 4px', fontWeight: 500, fontFamily: "'Murecho', sans-serif" }}>
                     {product.category}
                 </p>
 
                 <p
                     style={{
-                        fontSize: '14px',
+                        fontSize: '18px',
                         fontWeight: 600,
+                        fontFamily: 'Murecho',
                         color: 'var(--text-main)',
                         margin: '0 0 10px',
                         lineHeight: 1.45,
@@ -51,9 +52,10 @@ const ProductCard = ({ product }: { product: Product }) => {
                 >
                     {product.name}
                 </p>
+                <p style={{ fontSize: '14px', color: 'var(--text-muted)', margin: '0 0 4px', fontWeight: 500, fontFamily: 'Murecho'}}>{product.description}</p>
 
-                <p style={{ fontSize: '16px', fontWeight: 700, color: 'var(--primary)', margin: 0 }}>
-                    ৳ {product.price.toLocaleString()}
+                <p style={{ fontSize: '20px', fontWeight: 700, color: 'var(--primary)', margin: 0 }}>
+                    <span style={{ fontSize: '30px' }}>৳</span> {product.price.toLocaleString()}
                 </p>
 
                 {product.stock < 10 && (
